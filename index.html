@@ -7,81 +7,261 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { --primary-color: #8da399; --accent-color: #d4a373; }
-        body { font-family: "Microsoft JhengHei", sans-serif; color: #444; }
-        .hero { background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&q=80&w=1200') center/cover; height: 60vh; display: flex; align-items: center; justify-content: center; color: white; text-align: center; }
+        body { font-family: "Microsoft JhengHei", sans-serif; color: #444; background-color: #faf9f6; }
+        .hero { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&q=80&w=1200') center/cover; height: 50vh; display: flex; align-items: center; justify-content: center; color: white; text-align: center; }
         .btn-primary { background-color: var(--primary-color); border: none; }
         .btn-primary:hover { background-color: #6e837a; }
-        .product-card { border: none; transition: 0.3s; margin-bottom: 30px; }
+        .product-card { border: none; transition: 0.3s; margin-bottom: 30px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        footer { background: #f8f9fa; padding: 50px 0; border-top: 1px solid #eee; }
+        .cart-badge { background-color: var(--accent-color); font-size: 0.8em; }
+        footer { background: #eee; padding: 40px 0; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
     <div class="container">
         <a class="navbar-brand fw-bold" href="#" style="color: var(--primary-color);">純淨手作 SOAP</a>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="#products">精選產品</a>
-            <a class="nav-link" href="#about">關於我們</a>
-        </div>
+        <button class="btn btn-outline-secondary position-relative ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+            🛒 購物車
+            <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge">0</span>
+        </button>
     </div>
 </nav>
 
 <section class="hero">
     <div>
-        <h1 class="display-4 fw-bold">洗淨疲憊，擁抱自然</h1>
-        <p class="lead">每一塊皂，都是對土地的溫柔承諾</p>
-        <a href="#products" class="btn btn-primary btn-lg px-4">探索系列</a>
+        <h1 class="display-5 fw-bold mb-3">洗淨疲憊，擁抱自然</h1>
+        <p class="lead mb-4">每一塊皂，都是對土地的溫柔承諾</p>
     </div>
 </section>
 
 <section id="products" class="container py-5">
-    <h2 class="text-center mb-5 fw-bold">精選手工皂</h2>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card product-card text-center">
-                <img src="https://images.unsplash.com/photo-1546913199-55e06682967e?auto=format&fit=crop&q=80&w=500" class="card-img-top" alt="薰衣草">
-                <div class="card-body">
-                    <h5 class="card-title">舒緩薰衣草</h5>
-                    <p class="text-muted">NT$ 250</p>
-                    <button class="btn btn-outline-secondary btn-sm">查看詳情</button>
-                </div>
-            </div>
+    <h2 class="text-center mb-5 fw-bold" style="color: var(--primary-color);">精選手工皂</h2>
+    <div class="row" id="productList">
         </div>
-        <div class="col-md-4">
-            <div class="card product-card text-center">
-                <img src="https://images.unsplash.com/photo-1605264964528-06403738d6dc?auto=format&fit=crop&q=80&w=500" class="card-img-top" alt="茶樹">
-                <div class="card-body">
-                    <h5 class="card-title">清爽茶樹炭</h5>
-                    <p class="text-muted">NT$ 280</p>
-                    <button class="btn btn-outline-secondary btn-sm">查看詳情</button>
-                </div>
+</section>
+
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card product-card text-center">
-                <img src="https://images.unsplash.com/photo-1590439471364-192aa70c0b53?auto=format&fit=crop&q=80&w=500" class="card-img-top" alt="蜂蜜">
-                <div class="card-body">
-                    <h5 class="card-title">潤澤蜂蜜燕麥</h5>
-                    <p class="text-muted">NT$ 300</p>
-                    <button class="btn btn-outline-secondary btn-sm">查看詳情</button>
+            <div class="modal-body p-4 pt-0 row" id="modalContent">
                 </div>
-            </div>
         </div>
     </div>
-</section>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas" style="width: 400px;">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold">🛒 你的購物車</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column">
+        <div id="cartItems" class="flex-grow-1 overflow-auto mb-3">
+            <p class="text-center text-muted mt-5">購物車目前是空的喔！</p>
+        </div>
+        
+        <div class="border-top pt-3">
+            <form id="checkoutForm">
+                <div class="mb-2">
+                    <label class="form-label text-muted small mb-1">運送方案</label>
+                    <select class="form-select form-select-sm" id="shippingMethod" onchange="updateCartUI()">
+                        <option value="60">7-11 / 全家 店到店 (NT$ 60)</option>
+                        <option value="100">黑貓宅配 (NT$ 100)</option>
+                        <option value="0">台南學甲工作室自取 (免運)</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <input type="text" class="form-control form-control-sm" placeholder="收件人姓名" required>
+                </div>
+                <div class="mb-3">
+                    <input type="tel" class="form-control form-control-sm" placeholder="聯絡電話" required>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>商品總計：</span>
+                    <span id="subtotal">NT$ 0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2 text-muted small">
+                    <span>運費：</span>
+                    <span id="shippingFee">NT$ 60</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 fw-bold fs-5" style="color: var(--accent-color);">
+                    <span>應付總額：</span>
+                    <span id="totalPrice">NT$ 0</span>
+                </div>
+                <button type="submit" class="btn btn-primary w-100" id="checkoutBtn" disabled>送出訂單</button>
+            </form>
+        </div>
+    </div>
+</div>
 
 <footer class="text-center">
     <div class="container">
-        <p class="mb-1">純淨手作手工皂工坊</p>
-        <p class="text-muted small">© 2026 Handmade Soap Co. All Rights Reserved.</p>
-        <div class="mt-3">
-            <small>📍 台灣台南市學甲區 | 📞 0912-345-678</small>
-        </div>
+        <p class="mb-1 fw-bold text-muted">純淨手作 SOAP</p>
+        <small class="text-muted">📍 台灣台南市學甲區 | 📞 0912-345-678</small>
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 產品資料庫
+    const products = [
+        {
+            id: 1, name: '舒緩薰衣草', price: 250, 
+            img: 'https://images.unsplash.com/photo-1546913199-55e06682967e?auto=format&fit=crop&q=80&w=500',
+            desc: '來自南法的放鬆氣息。添加特級初榨橄欖油與天然薰衣草精油，泡沫綿密細緻。',
+            features: ['✔ 100% 天然精油', '✔ 適合乾性/敏感肌膚', '✔ 溫和洗淨不緊繃', '✔ 療癒舒壓香氣']
+        },
+        {
+            id: 2, name: '清爽茶樹備長炭', price: 280, 
+            img: 'https://images.unsplash.com/photo-1605264964528-06403738d6dc?auto=format&fit=crop&q=80&w=500',
+            desc: '油性肌膚的救星！備長炭強效吸附毛孔髒污，搭配澳洲茶樹精油，洗後清爽無負擔。',
+            features: ['✔ 深度清潔毛孔', '✔ 適合油性/混合肌膚', '✔ 抑菌抗痘配方', '✔ 涼爽草本氣味']
+        },
+        {
+            id: 3, name: '潤澤蜂蜜燕麥', price: 300, 
+            img: 'https://images.unsplash.com/photo-1590439471364-192aa70c0b53?auto=format&fit=crop&q=80&w=500',
+            desc: '給肌膚喝的營養補給品。使用在地小農純蜂蜜與細磨燕麥粉，輕柔去角質同時深層滋潤。',
+            features: ['✔ 豐富維生素潤澤', '✔ 適合所有膚質', '✔ 天然燕麥微去角質', '✔ 嬰兒般柔嫩觸感']
+        }
+    ];
+
+    let cart = []; // 購物車陣列
+
+    // 初始化頁面
+    window.onload = () => {
+        renderProducts();
+    };
+
+    // 1. 渲染產品列表
+    function renderProducts() {
+        const productList = document.getElementById('productList');
+        productList.innerHTML = products.map(p => `
+            <div class="col-md-4">
+                <div class="card product-card text-center h-100">
+                    <img src="${p.img}" class="card-img-top" style="height:250px; object-fit:cover;" alt="${p.name}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold">${p.name}</h5>
+                        <p class="text-muted mb-3">NT$ ${p.price}</p>
+                        <div class="mt-auto">
+                            <button class="btn btn-outline-secondary w-100 mb-2" onclick="openModal(${p.id})">👀 查看詳細介紹</button>
+                            <button class="btn btn-primary w-100" onclick="addToCart(${p.id})">加入購物車</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 2. 開啟詳細介紹視窗
+    function openModal(id) {
+        const p = products.find(item => item.id === id);
+        const modalContent = document.getElementById('modalContent');
+        modalContent.innerHTML = `
+            <div class="col-md-5">
+                <img src="${p.img}" class="img-fluid rounded" alt="${p.name}">
+            </div>
+            <div class="col-md-7 d-flex flex-column justify-content-center mt-3 mt-md-0">
+                <h3 class="fw-bold mb-2">${p.name}</h3>
+                <h4 class="text-danger mb-3">NT$ ${p.price}</h4>
+                <p class="text-muted">${p.desc}</p>
+                <div class="mb-4">
+                    <h6 class="fw-bold">✨ 產品特點：</h6>
+                    <ul class="list-unstyled text-muted small">
+                        ${p.features.map(f => `<li class="mb-1">${f}</li>`).join('')}
+                    </ul>
+                </div>
+                <button class="btn btn-primary btn-lg mt-auto" onclick="addToCart(${p.id}); bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();">立即加入購物車</button>
+            </div>
+        `;
+        new bootstrap.Modal(document.getElementById('productModal')).show();
+    }
+
+    // 3. 加入購物車
+    function addToCart(id) {
+        const p = products.find(item => item.id === id);
+        const existingItem = cart.find(item => item.id === id);
+        if (existingItem) {
+            existingItem.qty += 1;
+        } else {
+            cart.push({ ...p, qty: 1 });
+        }
+        updateCartUI();
+        
+        // 加入購物車的微動畫提示
+        const badge = document.getElementById('cartCount');
+        badge.classList.add('bg-danger');
+        setTimeout(() => badge.classList.remove('bg-danger'), 300);
+    }
+
+    // 4. 變更購物車數量
+    function changeQty(id, delta) {
+        const item = cart.find(i => i.id === id);
+        if (item) {
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            }
+            updateCartUI();
+        }
+    }
+
+    // 5. 更新購物車介面與計算金額
+    function updateCartUI() {
+        // 更新數量徽章
+        const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+        document.getElementById('cartCount').innerText = totalItems;
+
+        const cartItemsDiv = document.getElementById('cartItems');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+
+        if (cart.length === 0) {
+            cartItemsDiv.innerHTML = '<p class="text-center text-muted mt-5">購物車目前是空的喔！</p>';
+            document.getElementById('subtotal').innerText = 'NT$ 0';
+            document.getElementById('totalPrice').innerText = 'NT$ 0';
+            checkoutBtn.disabled = true;
+            return;
+        }
+
+        // 渲染購物車清單
+        cartItemsDiv.innerHTML = cart.map(item => `
+            <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                <img src="${item.img}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded me-3">
+                <div class="flex-grow-1">
+                    <h6 class="mb-0 small fw-bold">${item.name}</h6>
+                    <span class="text-muted small">NT$ ${item.price}</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-light px-2 py-0 border" onclick="changeQty(${item.id}, -1)">-</button>
+                    <span class="mx-2 small">${item.qty}</span>
+                    <button class="btn btn-sm btn-light px-2 py-0 border" onclick="changeQty(${item.id}, 1)">+</button>
+                </div>
+            </div>
+        `).join('');
+
+        // 計算金額
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        const shippingFee = parseInt(document.getElementById('shippingMethod').value);
+        const total = subtotal + shippingFee;
+
+        document.getElementById('subtotal').innerText = `NT$ ${subtotal}`;
+        document.getElementById('shippingFee').innerText = `NT$ ${shippingFee}`;
+        document.getElementById('totalPrice').innerText = `NT$ ${total}`;
+        checkoutBtn.disabled = false;
+    }
+
+    // 6. 送出訂單模擬
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('🎉 訂單已送出！(此為靜態網頁展示，目前尚無串接後端)');
+        cart = [];
+        updateCartUI();
+        bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas')).hide();
+    });
+</script>
 </body>
 </html>
